@@ -337,8 +337,14 @@ func _fire_charged(weapon: WeaponData) -> void:
 func _spawn_projectile(weapon: WeaponData, dir: Vector2) -> void:
         if dir.length_squared() < 0.001:
                 dir = Vector2.RIGHT
+        # Melee weapons spawn a melee swing instead of a projectile
+        if weapon.category == WeaponData.WeaponCategory.MELEE:
+                _spawn_melee_swing(weapon, dir)
+                return
         var scene: PackedScene = weapon.bullet_scene
         if scene == null:
+                # Pick a default based on weapon properties
+                # Could be explosive if damage is high and range is short... but for now, use base Projectile
                 scene = load("res://scenes/projectiles/Projectile.tscn")
         var proj := scene.instantiate() as Projectile
         get_tree().current_scene.add_child(proj)
@@ -346,6 +352,13 @@ func _spawn_projectile(weapon: WeaponData, dir: Vector2) -> void:
         proj.setup(weapon, dir, &"player")
         if weapon.muzzle_flash:
                 _spawn_muzzle_flash()
+
+func _spawn_melee_swing(weapon: WeaponData, dir: Vector2) -> void:
+        var scene := load("res://scenes/projectiles/MeleeSwing.tscn")
+        var swing := scene.instantiate() as MeleeSwing
+        get_tree().current_scene.add_child(swing)
+        swing.global_position = global_position
+        swing.setup(weapon, dir, &"player")
 
 func _spawn_muzzle_flash() -> void:
         var flash := ColorRect.new()

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/WeaponData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"burst_rifle"
+display_name = "Burst Rifle"
+description = "Fires a 3-round burst."
+category = 1
+fire_mode = 4
+is_ranged = true
+damage = 1
+energy_cost = 1
+fire_rate = 3.0
+projectile_speed = 650.0
+projectile_range = 500.0
+spread_degrees = 4.0
+pellets = 1
+burst_count = 3
+burst_delay = 0.08
+knockback = 10.0
+pierce = 0
+melee_arc_degrees = 90.0
+melee_range = 70.0
+charge_time = 0.0
+charge_damage_multiplier = 2.0
+projectile_color = Color(1, 0.6, 0.9, 1)
+projectile_radius = 4.0
+projectile_trail = false
+melee_color = Color(1, 1, 1, 1)
+shake_amount = 0.5
+muzzle_flash = true
+hit_particles = true

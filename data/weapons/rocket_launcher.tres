@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/WeaponData.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bexplosiveproj1" path="res://scenes/projectiles/ExplosiveProjectile.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"rocket_launcher"
+display_name = "Rocket Launcher"
+description = "Fires explosive rockets."
+category = 1
+fire_mode = 0
+is_ranged = true
+damage = 1
+energy_cost = 6
+fire_rate = 0.8
+projectile_speed = 400.0
+projectile_range = 450.0
+spread_degrees = 0.0
+pellets = 1
+burst_count = 1
+burst_delay = 0.06
+knockback = 30.0
+pierce = 0
+melee_arc_degrees = 90.0
+melee_range = 70.0
+charge_time = 0.0
+charge_damage_multiplier = 2.0
+projectile_color = Color(1, 0.4, 0.2, 1)
+projectile_radius = 7.0
+projectile_trail = true
+melee_color = Color(1, 1, 1, 1)
+shake_amount = 1.5
+muzzle_flash = true
+hit_particles = true
+bullet_scene = ExtResource("2")

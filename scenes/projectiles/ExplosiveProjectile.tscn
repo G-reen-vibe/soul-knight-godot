@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://bexplosiveproj1"]
+
+[ext_resource type="Script" path="res://scripts/weapons/ExplosiveProjectile.gd" id="1"]
+
+[node name="ExplosiveProjectile" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+monitoring = true
+script = ExtResource("1")
+speed = 400.0
+damage = 1
+max_range = 400.0
+pierce = 0
+knockback = 0.0
+radius = 6.0
+color = Color(1, 0.6, 0.2, 1)
+lifetime_after_hit = 0.0
+faction = &"player"
+explosion_radius = 120.0
+explosion_damage = 3
+explosion_knockback = 200.0
