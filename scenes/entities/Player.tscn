@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3 uid="uid://bplayer00001"]
+
+[ext_resource type="Script" path="res://scripts/player/Player.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/core/HealthComponent.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/core/Hurtbox.gd" id="3"]
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 4
+script = ExtResource("1")
+move_speed = 240.0
+dodge_speed = 520.0
+dodge_duration = 0.28
+dodge_cooldown = 0.6
+dodge_invuln = 0.22
+max_hp = 5
+max_armor = 0
+max_energy = 100
+energy_regen = 25.0
+energy_regen_delay = 0.5
+invuln_after_hit = 0.8
+potions = 1
+potion_heal_amount = 3
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2")
+max_hp = 5
+max_armor = 0
+invuln_time = 0.6
+is_invuln_during_flash = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+monitorable = true
+monitoring = false
+script = ExtResource("3")
+faction = &"player"
+hit_cooldown = 0.0
