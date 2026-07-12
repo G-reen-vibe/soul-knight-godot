@@ -18,6 +18,7 @@ var _distance_traveled: float = 0.0
 var _visual: ColorRect
 var _trail: Line2D
 var _dead: bool = false
+var _hit_targets: Array = []  # nodes already hit (prevents double-damage on pierce)
 
 signal hit_something
 
@@ -71,10 +72,11 @@ func _apply_visuals() -> void:
         collision_mask = _opposing_mask(faction)
 
 func _opposing_mask(f: StringName) -> int:
+        # Include wall layer (4) so projectiles collide with walls
         match f:
-                &"player": return 2  # hit enemy layer
-                &"enemy": return 1   # hit player layer
-                _: return 0
+                &"player": return 2 | 4  # enemy + walls
+                &"enemy": return 1 | 4   # player + walls
+                _: return 4
 
 func _physics_process(delta: float) -> void:
         if _dead:
@@ -94,6 +96,8 @@ func _on_area_entered(area: Area2D) -> void:
 func _resolve_hit(node: Node) -> void:
         if _dead:
                 return
+        if node in _hit_targets:
+                return
         if node is TileMapLayer:
                 # Wall - just disappear
                 _die()
@@ -109,10 +113,15 @@ func _resolve_hit(node: Node) -> void:
                                 break
         if hurtbox == null:
                 # It's a wall (StaticBody2D without a Hurtbox child)
+                _hit_targets.append(node)
                 _die()
                 return
         if hurtbox.faction == faction:
                 return  # same faction, ignore
+        _hit_targets.append(node)
+        # Also add the hurtbox itself to prevent area_entered from double-hitting
+        if not (hurtbox in _hit_targets):
+                _hit_targets.append(hurtbox)
         var dealt := hurtbox.take_hit(damage, get_instance_id())
         if dealt > 0:
                 _apply_knockback(hurtbox)

@@ -101,11 +101,11 @@ func _ready() -> void:
         var effective_max_hp: int = Global.carry_max_hp if Global.carry_max_hp > 0 else max_hp
         _health.max_hp = effective_max_hp
         _health.current_hp = Global.carry_current_hp if Global.carry_current_hp > 0 else effective_max_hp
-        _health.max_armor = 9
+        _health.max_armor = max_armor
         _health.current_armor = Global.carry_armor
-        max_energy = Global.carry_max_energy
-        _current_energy = Global.carry_current_energy
-        potions = Global.carry_potions
+        max_energy = Global.carry_max_energy if Global.carry_max_energy > 0 else max_energy
+        _current_energy = Global.carry_current_energy if Global.carry_current_energy > 0 else max_energy
+        potions = Global.carry_potions if Global.carry_potions > 0 else potions
         _refresh_ui_signals()
 
 func _apply_character_data() -> void:
@@ -227,7 +227,10 @@ func _update_timers(delta: float) -> void:
         if _fire_cooldown > 0.0:
                 _fire_cooldown -= delta
         if _burst_timer > 0.0:
-                _fire_burst_tick()
+                _burst_timer -= delta
+                if _burst_timer <= 0.0:
+                        _burst_timer = 0.0
+                        _fire_burst_tick()
         if _dodge_cd_timer > 0.0:
                 _dodge_cd_timer -= delta
 
@@ -429,13 +432,15 @@ func _activate_skill() -> void:
                 _default_skill()
 
 func _default_skill() -> void:
+        # Set cooldown immediately to prevent spam during the await
+        _skill_cd = _skill_max_cd
         # Default: brief invulnerability + speed boost for 2s
         _health.invuln_timer = 2.0
         var orig_speed := move_speed
         move_speed *= 1.5
         await get_tree().create_timer(2.0).timeout
-        move_speed = orig_speed
-        _skill_cd = _skill_max_cd
+        if is_instance_valid(self):
+                move_speed = orig_speed
 
 func set_skill_handler(handler: Node) -> void:
         _skill_handler = handler
@@ -470,6 +475,9 @@ func cycle_weapon() -> void:
 
 func use_potion() -> void:
         if potions <= 0:
+                return
+        # Don't waste potions at full HP
+        if _health.current_hp >= _health.max_hp:
                 return
         potions -= 1
         _health.heal(potion_heal_amount)
@@ -520,7 +528,8 @@ func _on_died() -> void:
         _sprite.color = Color(0.5, 0.1, 0.1, 1.0)
         _sprite.modulate.a = 0.4
         emit_signal("died")
-        Global.change_state(Global.GameState.GAME_OVER)
+        # Defer state change to avoid modifying game state during physics callbacks
+        Global.call_deferred("change_state", Global.GameState.GAME_OVER)
 
 func _physics_process(_delta: float) -> void:
         if _is_dead:

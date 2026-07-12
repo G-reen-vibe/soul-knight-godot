@@ -40,6 +40,8 @@ func _ready() -> void:
         _health = $HealthComponent
         _hurtbox = $Hurtbox
         _health.max_hp = max_hp
+        _health.current_hp = max_hp  # ensure HP matches the script's max_hp
+        _health.max_armor = 0
         _health.invuln_time = invuln_after_hit
         _health.hp_changed.connect(func(c, m): emit_signal("hp_changed", c, m))
         _health.died.connect(_on_died)
@@ -89,8 +91,8 @@ func _physics_process(delta: float) -> void:
         var ai_velocity: Vector2 = Vector2.ZERO
         if _target != null and is_instance_valid(_target):
                 ai_velocity = _ai_think(delta)
-        # Apply knockback decay
-        _knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, _knockback_decay * delta)
+        # Apply knockback decay (clamped to prevent overshoot at low FPS)
+        _knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, clampf(_knockback_decay * delta, 0.0, 1.0))
         velocity = ai_velocity + _knockback_velocity
         # Contact damage
         if _target != null and is_instance_valid(_target):
@@ -133,8 +135,14 @@ func _process(delta: float) -> void:
         # Visual flash when invulnerable
         if _health.is_invulnerable():
                 _sprite.modulate.a = 0.5 if fmod(Time.get_ticks_msec() * 0.01, 1.0) > 0.5 else 1.0
+                _sprite.modulate.r = 2.0
+                _sprite.modulate.g = 2.0
+                _sprite.modulate.b = 2.0
         else:
                 _sprite.modulate.a = 1.0
+                _sprite.modulate.r = 1.0
+                _sprite.modulate.g = 1.0
+                _sprite.modulate.b = 1.0
 
 func apply_knockback(dir: Vector2, force: float) -> void:
         _knockback_velocity = dir.normalized() * force

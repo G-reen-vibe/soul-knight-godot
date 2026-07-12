@@ -48,6 +48,11 @@ func set_player(player: Player) -> void:
         _player.potions_changed.connect(_on_potions_changed)
         _player.weapon_changed.connect(_on_weapon_changed)
         _player.skill_ready_changed.connect(_on_skill_changed)
+        # Connect to buff changes
+        var buffs_node := _player.get_node_or_null("PlayerBuffs") as PlayerBuffs
+        if buffs_node:
+                buffs_node.buff_added.connect(func(_buff): _refresh_buffs())
+                buffs_node.buff_removed.connect(func(_buff): _refresh_buffs())
         _refresh_all()
 
 func _build_ui() -> void:

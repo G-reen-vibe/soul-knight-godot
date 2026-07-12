@@ -281,7 +281,12 @@ func _spawn_treasure() -> void:
                         add_child(pickup)
                         pickup.global_position = global_position + Vector2(0, 0)
 
-func _on_enemy_died(_enemy: Enemy) -> void:
+func _on_enemy_died(enemy: Enemy) -> void:
+        # Notify player's buff system (for lifesteal, etc.)
+        if _player and is_instance_valid(_player):
+                var buffs_node := _player.get_node_or_null("PlayerBuffs") as PlayerBuffs
+                if buffs_node:
+                        buffs_node.on_enemy_killed()
         # Check if all enemies are dead
         var alive := 0
         for e in _spawned_enemies:

@@ -91,12 +91,12 @@ func _apply_effect() -> void:
                 Kind.GEM:
                         Global.add_gems(value)
                 Kind.HEALTH_POTION:
-                        if _player.has_method("_health") and _player._health is HealthComponent:
-                                _player._health.heal(value)
+                        var health_comp = _player.get("_health")
+                        if health_comp is HealthComponent:
+                                health_comp.heal(value)
                 Kind.ENERGY_POTION:
-                        if _player.has_method("max_energy"):
-                                _player._current_energy = min(_player.max_energy, _player._current_energy + value)
-                                _player.emit_signal("energy_changed", int(_player._current_energy), _player.max_energy)
+                        _player._current_energy = min(_player.max_energy, _player._current_energy + value)
+                        _player.emit_signal("energy_changed", int(_player._current_energy), _player.max_energy)
                 Kind.BUFF:
                         _apply_buff()
                 Kind.WEAPON:

@@ -133,7 +133,7 @@ func _regenerate_floor() -> void:
 
 func _process(_delta: float) -> void:
         # Center camera on current room
-        if _current_room:
+        if _current_room and _player and is_instance_valid(_player):
                 var cam := _player.get_node_or_null("Camera2D") as Camera2D
                 if cam:
                         cam.global_position = _current_room.global_position

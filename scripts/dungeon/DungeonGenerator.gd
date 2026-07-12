@@ -76,12 +76,13 @@ static func generate(floor_num: int) -> DungeonLayout:
                                         r.connections.append(neighbor.index)
                                 if not neighbor.connections.has(r.index):
                                         neighbor.connections.append(r.index)
-                                # Add door
-                                var door := DoorData.new()
-                                door.from_room = r.index
-                                door.to_room = neighbor.index
-                                door.direction = dir_vec
-                                layout.doors.append(door)
+                                # Only add one door per pair (avoid duplicates)
+                                if r.index < neighbor.index:
+                                        var door := DoorData.new()
+                                        door.from_room = r.index
+                                        door.to_room = neighbor.index
+                                        door.direction = dir_vec
+                                        layout.doors.append(door)
         # Store rooms (typed array)
         var typed_rooms: Array[RoomData] = []
         for r in all_rooms:
