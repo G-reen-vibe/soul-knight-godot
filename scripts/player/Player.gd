@@ -31,6 +31,7 @@ signal died
 @export var potions: int = 1
 @export var potion_heal_amount: int = 3
 @export var starting_weapons: Array[WeaponData] = []
+@export var character_data: CharacterData = null
 
 # ----- Internal state -----
 var _health: HealthComponent
@@ -66,6 +67,7 @@ var _muzzle: Marker2D
 # Skill handler (set by character subclass)
 var _skill_handler: Node = null
 var _test_aim_override: Vector2 = Vector2.ZERO  # if non-zero, forces aim direction (for testing)
+var _pending_body_color: Color = Color(0.3, 0.7, 0.9, 1.0)
 
 # Public read-only
 var coins: int = 0
@@ -73,6 +75,8 @@ var coins: int = 0
 func _ready() -> void:
         _health = $HealthComponent
         _hurtbox = $Hurtbox
+        # Apply character data if available
+        _apply_character_data()
         _health.max_hp = max_hp
         _health.max_armor = max_armor
         _health.invuln_time = invuln_after_hit
@@ -104,6 +108,39 @@ func _ready() -> void:
         potions = Global.carry_potions
         _refresh_ui_signals()
 
+func _apply_character_data() -> void:
+        if character_data == null:
+                # Try to load from Global
+                var path := "res://data/characters/%s.tres" % Global.current_character_id
+                character_data = load(path) as CharacterData
+        if character_data == null:
+                # Default to knight
+                character_data = load("res://data/characters/knight.tres") as CharacterData
+        if character_data == null:
+                return
+        max_hp = character_data.max_hp
+        max_armor = character_data.max_armor
+        max_energy = character_data.max_energy
+        energy_regen = character_data.energy_regen
+        move_speed = character_data.move_speed
+        potions = 1
+        # Set skill handler
+        if character_data.skill_script_path != "":
+                var script := load(character_data.skill_script_path)
+                if script:
+                        _skill_handler = Node.new()
+                        _skill_handler.set_script(script)
+                        add_child(_skill_handler)
+                        set_skill_cooldown(character_data.skill_cooldown)
+        # Set body color (after _setup_visuals runs)
+        # We'll apply this in _setup_visuals via a flag
+        _pending_body_color = character_data.body_color
+        # Set starting weapon if not overridden
+        if starting_weapons.is_empty():
+                var w := load("res://data/weapons/%s.tres" % character_data.starting_weapon_id) as WeaponData
+                if w:
+                        starting_weapons = [w]
+
 func _refresh_ui_signals() -> void:
         emit_signal("hp_changed", _health.current_hp, _health.max_hp)
         emit_signal("armor_changed", _health.current_armor, _health.max_armor)
@@ -130,7 +167,7 @@ func _load_weapons_from_ids(ids: Array) -> void:
 # ----- Visuals -----
 func _setup_visuals() -> void:
         _sprite = ColorRect.new()
-        _sprite.color = Color(0.3, 0.7, 0.9, 1.0)
+        _sprite.color = _pending_body_color
         _sprite.size = Vector2(36, 36)
         _sprite.position = Vector2(-18, -18)
         _sprite.z_index = 5

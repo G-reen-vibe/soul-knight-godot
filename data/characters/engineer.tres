@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/CharacterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"engineer"
+display_name = "Engineer"
+description = "Defensive specialist who deploys turrets."
+max_hp = 6
+max_armor = 0
+max_energy = 100
+energy_regen = 25.0
+move_speed = 220.0
+skill_cooldown = 10.0
+skill_description = "Turret: deploys an auto-targeting turret for 8 seconds."
+starting_weapon_id = &"pistol"
+body_color = Color(0.8, 0.7, 0.3, 1)
+skill_script_path = "res://scripts/player/skills/SkillEngineer.gd"

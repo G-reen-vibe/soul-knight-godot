@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/CharacterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wizard"
+display_name = "Wizard"
+description = "Glass cannon with a powerful AoE skill."
+max_hp = 4
+max_armor = 0
+max_energy = 120
+energy_regen = 30.0
+move_speed = 230.0
+skill_cooldown = 5.0
+skill_description = "Fireball Ring: releases 12 fireballs in all directions."
+starting_weapon_id = &"pistol"
+body_color = Color(0.8, 0.4, 0.9, 1)
+skill_script_path = "res://scripts/player/skills/SkillWizard.gd"

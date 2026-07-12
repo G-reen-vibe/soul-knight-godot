@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/CharacterData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rogue"
+display_name = "Rogue"
+description = "Mobile assassin with a blink skill."
+max_hp = 5
+max_armor = 0
+max_energy = 100
+energy_regen = 28.0
+move_speed = 270.0
+skill_cooldown = 3.0
+skill_description = "Blink: teleport a short distance in aim direction."
+starting_weapon_id = &"pistol"
+body_color = Color(0.3, 0.9, 0.5, 1)
+skill_script_path = "res://scripts/player/skills/SkillRogue.gd"
