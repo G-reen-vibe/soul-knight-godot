@@ -100,12 +100,14 @@ func _apply_knockback(hurtbox: Hurtbox) -> void:
                 return
         var target := hurtbox.get_parent()
         if target is CharacterBody2D:
-                var dir := (target.global_position - global_position).normalized()
+                var t := target as CharacterBody2D
+                var dir: Vector2 = (t.global_position - global_position).normalized()
                 if dir.length_squared() < 0.001:
                         dir = Vector2.RIGHT
-                (target as CharacterBody2D).velocity += dir * knockback
+                t.velocity += dir * knockback
         elif target is RigidBody2D:
-                var dir := (target.global_position - global_position).normalized()
+                var t := target as RigidBody2D
+                var dir: Vector2 = (t.global_position - global_position).normalized()
                 if dir.length_squared() < 0.001:
                         dir = Vector2.RIGHT
-                (target as RigidBody2D).apply_impulse(dir * knockback * 2.0)
+                t.apply_impulse(dir * knockback * 2.0)
