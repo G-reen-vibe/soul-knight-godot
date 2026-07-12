@@ -9,12 +9,24 @@ var _layout: DungeonLayout
 var _current_room: Room
 var _player: Player
 var _rooms_by_index: Dictionary = {}
+var _hud: HUD
 
 func _ready() -> void:
         # Generate layout
         _layout = DungeonGenerator.generate(floor_number)
-        # Spawn the start room
+        # Spawn HUD
+        var hud_script := load("res://scripts/ui/HUD.gd")
+        var hud_node := CanvasLayer.new()
+        hud_node.set_script(hud_script)
+        hud_node.name = "HUD"
+        add_child(hud_node)
+        _hud = hud_node as HUD
+        _hud.set_floor(floor_number)
+        # Spawn the start room (which creates the player)
         _enter_room(_layout.start_room_index, null)
+        # Now connect player to HUD
+        if _player:
+                _hud.set_player(_player)
 
 func get_layout() -> DungeonLayout:
         return _layout

@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://bweaponpickup01"]
+
+[ext_resource type="Script" path="res://scripts/items/WeaponPickup.gd" id="1"]
+
+[node name="WeaponPickup" type="Area2D"]
+collision_layer = 8
+collision_mask = 1
+monitorable = false
+monitoring = true
+script = ExtResource("1")
+kind = 5
+value = 1
+magnet_range = 60.0
+collect_range = 22.0
+magnet_speed = 0.0
+bob_height = 4.0
+bob_speed = 2.5

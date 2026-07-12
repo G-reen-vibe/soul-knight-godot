@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BuffData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/BuffData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"lifesteal"
+display_name = "Lifesteal"
+description = "Heal 1 HP every 5 kills"
+type = 10
+value = 1
+color = Color(0.9, 0.2, 0.4, 1)

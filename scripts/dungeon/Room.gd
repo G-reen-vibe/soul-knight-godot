@@ -200,7 +200,13 @@ func activate(player: Player) -> void:
                         _cleared = true
                         room_data.cleared = true
                         emit_signal("room_cleared", self)
-                3, 4:  # SHOP, TREASURE - no enemies, doors open
+                3:  # SHOP - spawn shop NPC, doors open
+                        _spawn_shop()
+                        _cleared = true
+                        room_data.cleared = true
+                        emit_signal("room_cleared", self)
+                4:  # TREASURE - spawn a treasure (weapon/buff), doors open
+                        _spawn_treasure()
                         _cleared = true
                         room_data.cleared = true
                         emit_signal("room_cleared", self)
@@ -221,20 +227,48 @@ func _spawn_enemies() -> void:
                 enemy.died.connect(_on_enemy_died)
 
 func _spawn_boss() -> void:
-        # For now, spawn a regular grunt as a placeholder. Will be replaced with a real boss later.
         _enemies_container = Node2D.new()
         _enemies_container.name = "Enemies"
         add_child(_enemies_container)
-        var boss_scene := load("res://scenes/entities/EnemyGrunt.tscn")
+        var boss_scene := load("res://scenes/entities/BossEnemy.tscn")
         var boss := boss_scene.instantiate() as Enemy
         boss.global_position = Vector2(200, 0)
-        # Make boss tougher
-        boss.max_hp = 20
-        boss.contact_damage = 2
-        boss.coins_on_death = 5
         _enemies_container.add_child(boss)
         _spawned_enemies.append(boss)
         boss.died.connect(_on_enemy_died)
+
+func _spawn_shop() -> void:
+        var shop_scene := load("res://scenes/entities/ShopNPC.tscn")
+        var shop := shop_scene.instantiate() as Node2D
+        shop.global_position = Vector2(0, -100)
+        add_child(shop)
+
+func _spawn_treasure() -> void:
+        # Spawn a treasure chest-like pickup: either a weapon or a buff
+        var rng := RandomNumberGenerator.new()
+        rng.randomize()
+        var roll := rng.randi() % 3
+        match roll:
+                0:  # Weapon pickup
+                        var weapon_pickup_scene := load("res://scenes/entities/WeaponPickup.tscn")
+                        var pickup := weapon_pickup_scene.instantiate() as WeaponPickup
+                        # Pick a random weapon
+                        var weapon_ids := ["smg", "shotgun", "sniper", "burst_rifle", "rocket_launcher", "charge_pistol", "sword"]
+                        pickup.weapon_id = weapon_ids[rng.randi() % weapon_ids.size()]
+                        pickup.global_position = Vector2(0, 0)
+                        add_child(pickup)
+                1:  # Buff pickup
+                        var buff_pickup_scene := load("res://scenes/entities/BuffPickup.tscn")
+                        var pickup := buff_pickup_scene.instantiate() as Node2D
+                        pickup.global_position = Vector2(0, 0)
+                        add_child(pickup)
+                2:  # Health potion
+                        var potion_scene := load("res://scenes/entities/Pickup.tscn")
+                        var pickup := potion_scene.instantiate() as Pickup
+                        pickup.kind = Pickup.Kind.HEALTH_POTION
+                        pickup.value = 3
+                        pickup.global_position = Vector2(0, 0)
+                        add_child(pickup)
 
 func _on_enemy_died(_enemy: Enemy) -> void:
         # Check if all enemies are dead
