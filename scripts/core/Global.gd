@@ -98,8 +98,8 @@ func add_gems(amount: int) -> void:
 func reset_run() -> void:
         carry_max_hp = 0
         carry_current_hp = 0
-        carry_max_energy = 100
-        carry_current_energy = 100
+        carry_max_energy = 0  # 0 means use character's max_energy
+        carry_current_energy = 0
         carry_armor = 0
         carry_potions = 1
         carry_weapon_ids = []  # empty so character's starting weapon is used on floor 1
