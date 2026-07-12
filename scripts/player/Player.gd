@@ -65,6 +65,7 @@ var _muzzle: Marker2D
 
 # Skill handler (set by character subclass)
 var _skill_handler: Node = null
+var _test_aim_override: Vector2 = Vector2.ZERO  # if non-zero, forces aim direction (for testing)
 
 # Public read-only
 var coins: int = 0
@@ -194,12 +195,19 @@ func _update_timers(delta: float) -> void:
                 _dodge_cd_timer -= delta
 
 func _update_aim() -> void:
+        if _test_aim_override.length_squared() > 0.01:
+                _aim_dir = _test_aim_override.normalized()
+                _weapon_pivot.rotation = _aim_dir.angle()
+                return
         var mouse_pos := get_global_mouse_position()
         var to_mouse := mouse_pos - global_position
         if to_mouse.length_squared() > 1.0:
                 _aim_dir = to_mouse.normalized()
         # Face the aim direction (rotate weapon pivot)
         _weapon_pivot.rotation = _aim_dir.angle()
+
+func set_test_aim(dir: Vector2) -> void:
+        _test_aim_override = dir
 
 func _update_movement(delta: float) -> void:
         if _dodge_timer > 0.0:

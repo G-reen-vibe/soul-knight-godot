@@ -1,0 +1,10 @@
+[gd_scene load_steps=5 format=3 uid="uid://btestplayertests"]
+
+[ext_resource type="PackedScene" uid="uid://btestplayer001" path="res://scenes/tests/TestPlayerArena.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/tests/PlayerTestRunner.gd" id="2"]
+
+[node name="TestRunner" instance=ExtResource("1")]
+script = ExtResource("2")
+tests_to_run = 10
+auto_quit = true
+quit_delay = 1.0
