@@ -14,6 +14,7 @@ enum Kind { COIN, GEM, HEALTH_POTION, ENERGY_POTION, BUFF, WEAPON }
 
 var _player: Node2D
 var _being_magnetized: bool = false
+var _being_collected: bool = false
 var _spawn_y: float = 0.0
 var _time: float = 0.0
 var _sprite: ColorRect
@@ -73,6 +74,9 @@ func _on_body_entered(body: Node) -> void:
                 _collect()
 
 func _collect() -> void:
+        if _being_collected:
+                return
+        _being_collected = true
         emit_signal("collected", kind, value)
         _apply_effect()
         _play_collect_anim()

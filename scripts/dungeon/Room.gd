@@ -17,6 +17,7 @@ var _player: Player
 var _spawned_enemies: Array = []
 var _is_active: bool = false
 var _cleared: bool = false
+var _door_cooldown: float = 0.0  # prevents door trigger spam after entering
 
 func _ready() -> void:
         _build_visuals()
@@ -166,7 +167,6 @@ func _make_door_node(dir: Vector2i, neighbor_idx: int) -> Node2D:
         return door
 
 func _on_door_body_entered(body: Node, door: Area2D) -> void:
-        print("[Room %d] door body_entered: %s active=%s cleared=%s in_player_group=%s" % [room_data.index if room_data else -1, body.name, _is_active, _cleared, body.is_in_group("player")])
         if not body.is_in_group("player"):
                 return
         if not _is_active:
@@ -174,13 +174,24 @@ func _on_door_body_entered(body: Node, door: Area2D) -> void:
         if not _cleared:
                 # Cannot leave until cleared
                 return
+        if _door_cooldown > 0.0:
+                return
         var neighbor_idx: int = door.get_meta("neighbor_idx")
         var dir: Vector2i = door.get_meta("direction")
         var dd := DoorData.new()
         dd.from_room = room_data.index
         dd.to_room = neighbor_idx
         dd.direction = dir
+        # Set cooldown on both this room and the destination
+        _door_cooldown = 0.5
         emit_signal("door_entered", dd)
+
+func set_door_cooldown(time: float) -> void:
+        _door_cooldown = time
+
+func _process(delta: float) -> void:
+        if _door_cooldown > 0.0:
+                _door_cooldown -= delta
 
 func activate(player: Player) -> void:
         _is_active = true
@@ -221,8 +232,8 @@ func _spawn_enemies() -> void:
                 var scene_path := "res://scenes/entities/EnemyGrunt.tscn" if spawn.kind == "grunt" else "res://scenes/entities/EnemyShooter.tscn"
                 var scene := load(scene_path)
                 var enemy := scene.instantiate() as Enemy
-                enemy.global_position = spawn.pos
                 _enemies_container.add_child(enemy)
+                enemy.global_position = global_position + spawn.pos
                 _spawned_enemies.append(enemy)
                 enemy.died.connect(_on_enemy_died)
 
@@ -232,16 +243,16 @@ func _spawn_boss() -> void:
         add_child(_enemies_container)
         var boss_scene := load("res://scenes/entities/BossEnemy.tscn")
         var boss := boss_scene.instantiate() as Enemy
-        boss.global_position = Vector2(200, 0)
         _enemies_container.add_child(boss)
+        boss.global_position = global_position + Vector2(200, 0)
         _spawned_enemies.append(boss)
         boss.died.connect(_on_enemy_died)
 
 func _spawn_shop() -> void:
         var shop_scene := load("res://scenes/entities/ShopNPC.tscn")
         var shop := shop_scene.instantiate() as Node2D
-        shop.global_position = Vector2(0, -100)
         add_child(shop)
+        shop.global_position = global_position + Vector2(0, -100)
 
 func _spawn_treasure() -> void:
         # Spawn a treasure chest-like pickup: either a weapon or a buff
@@ -255,20 +266,20 @@ func _spawn_treasure() -> void:
                         # Pick a random weapon
                         var weapon_ids := ["smg", "shotgun", "sniper", "burst_rifle", "rocket_launcher", "charge_pistol", "sword"]
                         pickup.weapon_id = weapon_ids[rng.randi() % weapon_ids.size()]
-                        pickup.global_position = Vector2(0, 0)
                         add_child(pickup)
+                        pickup.global_position = global_position + Vector2(0, 0)
                 1:  # Buff pickup
                         var buff_pickup_scene := load("res://scenes/entities/BuffPickup.tscn")
                         var pickup := buff_pickup_scene.instantiate() as Node2D
-                        pickup.global_position = Vector2(0, 0)
                         add_child(pickup)
+                        pickup.global_position = global_position + Vector2(0, 0)
                 2:  # Health potion
                         var potion_scene := load("res://scenes/entities/Pickup.tscn")
                         var pickup := potion_scene.instantiate() as Pickup
                         pickup.kind = Pickup.Kind.HEALTH_POTION
                         pickup.value = 3
-                        pickup.global_position = Vector2(0, 0)
                         add_child(pickup)
+                        pickup.global_position = global_position + Vector2(0, 0)
 
 func _on_enemy_died(_enemy: Enemy) -> void:
         # Check if all enemies are dead

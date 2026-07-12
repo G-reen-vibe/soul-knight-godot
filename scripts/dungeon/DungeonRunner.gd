@@ -75,6 +75,8 @@ func _enter_room(room_idx: int, from_door: DoorData) -> void:
         _player.global_position = _current_room.global_position + player_start
         _player.add_to_group("player")
         _current_room.activate(_player)
+        # Set door cooldown to prevent immediate back-transition
+        _current_room.set_door_cooldown(0.5)
 
 func _spawn_player() -> void:
         var player_scene := load("res://scenes/entities/Player.tscn")
@@ -82,6 +84,52 @@ func _spawn_player() -> void:
 
 func _on_room_cleared(room: Room) -> void:
         print("[Dungeon] Room %d cleared!" % room.room_data.index)
+        # If this is the boss room, advance to the next floor
+        if room.room_data.type == 2:  # BOSS
+                call_deferred("_advance_to_next_floor")
+
+func _advance_to_next_floor() -> void:
+        print("[Dungeon] Boss defeated! Advancing to next floor...")
+        # Carry over player state
+        if _player:
+                Global.carry_max_hp = _player._health.max_hp
+                Global.carry_current_hp = _player._health.current_hp
+                Global.carry_armor = _player._health.current_armor
+                Global.carry_max_energy = _player.max_energy
+                Global.carry_current_energy = int(_player._current_energy)
+                Global.carry_potions = _player.potions
+                var weapon_ids: Array = []
+                for w in _player._weapons:
+                        weapon_ids.append(String(w.id))
+                Global.carry_weapon_ids = weapon_ids
+        Global.current_run_floor += 1
+        # Save progress
+        if Global.current_run_floor > Global.highest_floor:
+                Global.highest_floor = Global.current_run_floor
+                Global.save_progress()
+        # Regenerate the floor in-place (deferred to allow physics to settle)
+        floor_number += 1
+        call_deferred("_regenerate_floor")
+
+func _regenerate_floor() -> void:
+        # Free old rooms
+        for room in _rooms_by_index.values():
+                if is_instance_valid(room):
+                        room.queue_free()
+        _rooms_by_index.clear()
+        # Remove the player from its current parent so it doesn't get freed with the room
+        if _player and _player.get_parent() != null:
+                _player.get_parent().remove_child(_player)
+        # Generate new layout
+        _layout = DungeonGenerator.generate(floor_number)
+        # Update HUD
+        if _hud:
+                _hud.set_floor(floor_number)
+        # Enter the new start room
+        _enter_room(_layout.start_room_index, null)
+        # Reconnect HUD to player (player was recreated by _enter_room)
+        if _player and _hud:
+                _hud.set_player(_player)
 
 func _process(_delta: float) -> void:
         # Center camera on current room

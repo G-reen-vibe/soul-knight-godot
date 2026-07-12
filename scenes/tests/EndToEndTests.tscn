@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bteste2e001"]
+
+[ext_resource type="Script" path="res://scripts/tests/EndToEndTestRunner.gd" id="1"]
+
+[node name="EndToEndTests" type="Node2D"]
+script = ExtResource("1")
+auto_quit = true
