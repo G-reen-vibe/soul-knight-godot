@@ -60,7 +60,6 @@ func activate() -> void:
 
 func deactivate() -> void:
         _active = false
-        monitoring = false
         set_deferred("monitoring", false)
         emit_signal("depleted")
 

@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgem00001"]
+
+[ext_resource type="Script" path="res://scripts/items/Pickup.gd" id="1"]
+
+[node name="Gem" type="Area2D"]
+collision_layer = 8
+collision_mask = 1
+monitorable = false
+monitoring = true
+script = ExtResource("1")
+kind = 1
+value = 1
+magnet_range = 120.0
+collect_range = 22.0
+magnet_speed = 350.0
+bob_height = 5.0
+bob_speed = 4.0

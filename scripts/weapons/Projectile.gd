@@ -133,14 +133,20 @@ func _die() -> void:
         if _dead:
                 return
         _dead = true
-        # Small impact pop
+        # Small impact pop (deferred to avoid physics-state errors)
+        call_deferred("_spawn_pop")
+        queue_free()
+
+func _spawn_pop() -> void:
+        if not is_instance_valid(get_parent()):
+                return
         var pop := ColorRect.new()
         pop.color = Color(color.r, color.g, color.b, 0.7)
         pop.size = Vector2(radius * 4, radius * 4)
         pop.position = Vector2(-radius * 2, -radius * 2)
         pop.z_index = 7
+        pop.global_position = global_position
         get_parent().add_child(pop)
         var tw := get_tree().create_tween()
         tw.tween_property(pop, "modulate:a", 0.0, 0.12)
         tw.tween_callback(pop.queue_free)
-        queue_free()
