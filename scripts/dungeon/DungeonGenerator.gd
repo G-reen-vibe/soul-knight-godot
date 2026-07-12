@@ -117,8 +117,8 @@ static func _grid_distance(a: Vector2i, b: Vector2i) -> int:
 static func _populate_enemies(room: RoomData, floor_num: int, rng: RandomNumberGenerator) -> void:
         var count: int = 3 + rng.randi() % 3 + min(2, floor_num / 2)
         for i in range(count):
-                var kind: int = rng.randi() % 3  # 0,1,2 -> grunt; 3+ -> shooter
-                var enemy_kind: String = "grunt" if kind < 2 else "shooter"
+                var kind: int = rng.randi() % 5  # 0-2 grunt, 3 shooter, 4 charger
+                var enemy_kind: String = "grunt" if kind < 3 else ("shooter" if kind == 3 else "charger")
                 var pos := Vector2(
                         rng.randf_range(-300, 300),
                         rng.randf_range(-200, 200)

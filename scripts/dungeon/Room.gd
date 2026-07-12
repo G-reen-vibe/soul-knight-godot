@@ -229,7 +229,11 @@ func _spawn_enemies() -> void:
         _enemies_container.name = "Enemies"
         add_child(_enemies_container)
         for spawn in room_data.enemy_spawns:
-                var scene_path := "res://scenes/entities/EnemyGrunt.tscn" if spawn.kind == "grunt" else "res://scenes/entities/EnemyShooter.tscn"
+                var scene_path: String = "res://scenes/entities/EnemyGrunt.tscn"
+                match spawn.kind:
+                        "grunt": scene_path = "res://scenes/entities/EnemyGrunt.tscn"
+                        "shooter": scene_path = "res://scenes/entities/EnemyShooter.tscn"
+                        "charger": scene_path = "res://scenes/entities/EnemyCharger.tscn"
                 var scene := load(scene_path)
                 var enemy := scene.instantiate() as Enemy
                 _enemies_container.add_child(enemy)
@@ -264,7 +268,7 @@ func _spawn_treasure() -> void:
                         var weapon_pickup_scene := load("res://scenes/entities/WeaponPickup.tscn")
                         var pickup := weapon_pickup_scene.instantiate() as WeaponPickup
                         # Pick a random weapon
-                        var weapon_ids := ["smg", "shotgun", "sniper", "burst_rifle", "rocket_launcher", "charge_pistol", "sword"]
+                        var weapon_ids := ["smg", "shotgun", "sniper", "burst_rifle", "rocket_launcher", "charge_pistol", "sword", "great_sword", "dagger", "machine_gun", "laser_pistol"]
                         pickup.weapon_id = weapon_ids[rng.randi() % weapon_ids.size()]
                         add_child(pickup)
                         pickup.global_position = global_position + Vector2(0, 0)
